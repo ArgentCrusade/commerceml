@@ -1,0 +1,32 @@
+{
+    "name": "argentcrusade/commerceml",
+    "description": "CommerceML 2 Parser",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "tzurbaev",
+            "email": "zurbaev@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "illuminate/support": "^7.0",
+        "sabre/xml": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.1",
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArgentCrusade\\CommerceML\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ArgentCrusade\\CommerceML\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable"
+}
