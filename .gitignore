@@ -1,4 +1,4 @@
 /.idea/
 /vendor/
-.php_cs
 phpunit.xml
+.phpunit.result.cache
