@@ -2,45 +2,52 @@ name: run-tests
 
 on: [push, pull_request]
 
+permissions:
+    contents: read
+
 jobs:
     test:
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
         strategy:
-            fail-fast: true
+            fail-fast: false
             matrix:
-                os: [ubuntu-latest]
-                php: [8.2]
+                php: ['8.4', '8.5']
+                laravel: ['10', '11', '12', '13']
 
-        name: PHP${{ matrix.php }}
+        name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }}
 
         steps:
             - name: Checkout code
               id: checkout-code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v6
 
             - name: Setup PHP
               id: setup-php
               uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}
-                  extensions: dom, curl, libxml, mbstring, zip, pcntl, bcmath, soap, intl, gd, exif, iconv
+                  extensions: dom, curl, libxml, mbstring, xmlreader, xmlwriter
                   coverage: none
+                  tools: composer:v2
 
             - name: Get Composer Cache Directory
               id: get-composer-cache
               run: |
-                  echo "::set-output name=dir::$(composer config cache-files-dir)"
+                  echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
 
             - name: Setup Cache
               id: setup-cache
-              uses: actions/cache@v2
+              uses: actions/cache@v5
               with:
                   path: ${{ steps.get-composer-cache.outputs.dir }}
-                  key: composer-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+                  key: composer-${{ runner.os }}-${{ matrix.php }}-${{ matrix.laravel }}-${{ hashFiles('composer.json', 'composer.lock') }}
+
+            - name: Validate Composer configuration
+              run: composer validate --strict
 
             - name: Install dependencies
               id: install-deps
-              run: composer install --no-interaction --prefer-dist --no-suggest
+              run: composer update --with "illuminate/support:^${{ matrix.laravel }}.0" --no-interaction --prefer-dist --no-progress
 
             - name: Run tests
               id: run-tests
